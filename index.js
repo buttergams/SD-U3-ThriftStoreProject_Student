@@ -148,9 +148,10 @@ const store2 = Store.createStore("Pine Tree Bargains", "Portland", "Maine", sale
 // Create products
 const fork = new Product(1, "Fork", "Kitchenware", 1.2, 15);
 const mug = new Product(2, "Mug", "Kitchenware", 2, 7);
+const toyTruck = new Product(3, "Toy Truck", "Toys", 4, 9);
 
 // Add products to inventory with different markup percentages
-store2.addItemToInventory(fork, 0.35);
+store2.addItemToInventory(toyTruck, 0.35);
 store2.addItemToInventory(mug, 0.4);
 
 // Attempt to sell an item with insufficient quantity
@@ -162,10 +163,11 @@ const store3 = Store.createStore("Granite State Finds", "Manchester", "New Hamps
 // Create products
 const plate = new Product(1, "Plate", "Kitchenware", 1.8, 12);
 const toyDoll = new Product(2, "Toy Doll", "Toys", 2.5, 6);
+const toyPlane = new Product(3, "Toy Plane", "Toys", 5, 6);
 
 // Add products to inventory with different markup percentages
 store3.addItemToInventory(plate, 0.25);
-store3.addItemToInventory(toyDoll, 0.3);
+store3.addItemToInventory(toyPlane, 0.3);
 
 // Sell items from the inventory
 store3.sellItem(1, 8, 0.25);
