@@ -53,32 +53,124 @@ const salesTax = [
     {state: 'Wyoming', tax: .04},
 ];
 
-//! Classes
+//* Product class
+class Product {
+    constructor(upc, name, type, purchasePrice, quantity = 1) {
+        this.upc = upc;
+        this.name = name;
+        this.type = type;
+        this.purchasePrice = purchasePrice;
+        this.quantity = quantity;
+        this.marketPrice = 0;
+    }
 
+    updateMarketPrice(markupPercentage) {
+        this.marketPrice = this.purchasePrice + (this.purchasePrice * markupPercentage);
+    }
+}
 
-//! CREATE STORES
-// Generate 3 different stores, each in a different state.
+//* Store class
+class Store {
+    constructor(name, city, state, saleTax) {
+        this.name = name;
+        this.location = {
+            city: city,
+            state: state
+        };
+        this.salesTax = saleTax;
+        this.inventory = [];
+        this.balance = 200;
+        this.expenses = 0;
+        this.profit = 0;
+        this.paidTax = 0;
+    }
 
-//! Inventory
+    static createStore(name, city, state, saleTax) {
+        return new Store(name, city, state, saleTax);
+    }
 
+    addItemToInventory(product, markupPercentage) {
+        const existingProduct = this.inventory.find(item => item.upc === product.upc);
 
-//! Stocking
+        if (existingProduct) {
+            existingProduct.quantity += product.quantity;
+        } else {
+            product.updateMarketPrice(markupPercentage);
+            this.inventory.push(product);
+            this.balance -= product.purchasePrice * product.quantity;
+        }
+    }
 
-//* First Store
+    sellItem(upc, quantity, markupPercentage) {
+        const product = this.inventory.find(item => item.upc === upc);
 
-//* Second Store
+        if (product && product.quantity >= quantity) {
+            product.updateMarketPrice(markupPercentage); // Update market price before selling
+            product.quantity -= quantity;
+            const totalPrice = product.marketPrice * quantity;
+            const purchaseCost = product.purchasePrice * quantity;
+            this.balance += totalPrice;
+            this.profit += totalPrice - purchaseCost;
+            this.expenses += purchaseCost;
+            this.paidTax += totalPrice * this.salesTax;
+        } else {
+            console.log(`Error: Item with UPC ${upc} is out of stock.`);
+        }
+    }
+}
 
-//* Third Store
+// Tax data for different states
+const saleTax = {
+    "Vermont": 0.06,
+    "Maine": 0.055,
+    "New Hampshire": 0 // New Hampshire has no sales tax
+};
 
-//! Selling
+//! First Store
+const store1 = Store.createStore("Green Mountain Thrift", "Burlington", "Vermont", saleTax["Vermont"]);
 
-//* First Store
+// Create products
+const spoon = new Product(1, "Spoon", "Kitchenware", 1.5, 10);
+const book = new Product(2, "Book", "Books", 3, 5);
+const toyCar = new Product(3, "Toy Car", "Toys", 2, 8);
 
-//* Second Store
+// Add products to inventory with different markup percentages
+store1.addItemToInventory(spoon, 0.3);
+store1.addItemToInventory(book, 0.4);
+store1.addItemToInventory(toyCar, 0.25);
 
-//* Third Store
+// Sell items from the inventory
+store1.sellItem(1, 5, 0.3);
+
+//! Second Store
+const store2 = Store.createStore("Pine Tree Bargains", "Portland", "Maine", saleTax["Maine"]);
+
+// Create products
+const fork = new Product(1, "Fork", "Kitchenware", 1.2, 15);
+const mug = new Product(2, "Mug", "Kitchenware", 2, 7);
+
+// Add products to inventory with different markup percentages
+store2.addItemToInventory(fork, 0.35);
+store2.addItemToInventory(mug, 0.4);
+
+// Attempt to sell an item with insufficient quantity
+store2.sellItem(2, 10, 0.3);
+
+//! Third Store
+const store3 = Store.createStore("Granite State Finds", "Manchester", "New Hampshire", saleTax["New Hampshire"]);
+
+// Create products
+const plate = new Product(1, "Plate", "Kitchenware", 1.8, 12);
+const toyDoll = new Product(2, "Toy Doll", "Toys", 2.5, 6);
+
+// Add products to inventory with different markup percentages
+store3.addItemToInventory(plate, 0.25);
+store3.addItemToInventory(toyDoll, 0.3);
+
+// Sell items from the inventory
+store3.sellItem(1, 8, 0.25);
 
 //! Testing
-/* 
-    Simply console log each store to check the completed details.
-*/
+console.log(store1);
+console.log(store2);
+console.log(store3);
